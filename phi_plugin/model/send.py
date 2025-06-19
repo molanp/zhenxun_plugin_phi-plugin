@@ -1,114 +1,94 @@
-from typing import Any
-
-from nonebot_plugin_alconna import Image, Text, UniMessage
+from nonebot_plugin_alconna import AlconnaMatcher, UniMessage
+from nonebot_plugin_alconna.uniseg.message import Receipt
 from nonebot_plugin_uninfo import Uninfo
 
-from zhenxun.services.log import logger
-from zhenxun.utils.message import MessageUtils
+from zhenxun.utils.rules import ensure_group
 
-from ..config import PluginConfig
-from .cls.common import Save
+from ..components.i18n import i18nList
+from .cls.Save import SaveModel
+from .cls.type import allFnc
+from .getBanGroup import getBanGroup
+from .getInfo import getInfo
 from .getSave import getSave
-from .getUpdateSave import getUpdateSave
 
 
 class send:
-    @classmethod
-    async def sendWithAt(cls, matcher, msg: Any, quote=True):
+    @staticmethod
+    async def send_with_At(
+        matcher: AlconnaMatcher,
+        session: Uninfo,
+        msg: UniMessage,
+        reply_to: bool = True,
+        recallMsg: int = 0,
+    ) -> Receipt:
         """
-        :param e: 响应器对象
-        :param msg: UniMessage支持的消息内容
-        :param quote: 是否引用回复
-        """
-        return await matcher.send(UniMessage(msg), at_sender=True, reply_to=quote)
+         私聊省略@
 
-    @classmethod
-    async def getsaveResult(
-        cls, matcher, session: Uninfo, ver, send=True
-    ) -> None | Save:
+        :param matcher: Alconna Matcher
+        :param session: Session
+        :param msg: 消息内容
+        :param quote: 是否引用回复
+        :param recallMsg: 撤回时间，0为不撤回
+        """
+        at_sender = ensure_group(session)
+        receipt = await matcher.send(msg, at_sender=at_sender, reply_to=reply_to)
+        assert isinstance(receipt, Receipt)
+        if recallMsg > 0:
+            await receipt.recall(delay=recallMsg)
+        return receipt
+
+    @staticmethod
+    async def getsave_result(
+        matcher: AlconnaMatcher, session: Uninfo, ver: float | None = None
+    ) -> SaveModel | None:
         """
         检查存档部分
+        - v1.0,取消对当次更新内容的存储，取消对task的记录，更正scoreHistory
+        - v1.1,更正scoreHistory
+        - v1.2,由于曲名错误，删除所有记录，曲名使用id记录
 
-        :param matcher: 响应器对象
-        :param ver int: 存档版本
-        :param send bool: 是否发送提示
-        :return: bool 是否成功
+        :param ver: 存档版本
+
+        :return: Save
         """
-
-        if PluginConfig.get("openPhiPluginApi"):
-            try:
-                user_save = await getUpdateSave.getNewSaveFromApi(session)
-                return await Save().constructor(user_save["save"])
-            except Exception as err:
-                if str(err) == "Phigros token is required":
-                    try:
-                        sessionToken = await getSave.get_user_token(session.user.id)
-                        if not sessionToken:
-                            if send:
-                                await cls.sendWithAt(
-                                    matcher,
-                                    "请先绑定sessionToken哦！\n"
-                                    "如果不知道自己的sessionToken可以尝试扫码绑定嗷！\n"
-                                    f"获取二维码：{PluginConfig.get('cmdhead')}"
-                                    " bind qrcode\n"
-                                    f"帮助：{PluginConfig.get('cmdhead')} tk help\n"
-                                    f"格式：{PluginConfig.get('cmdhead')} bind"
-                                    " <sessionToken>",
-                                )
-                            return None
-                        user_save = await getUpdateSave.getNewSaveFromApi(
-                            session, sessionToken
-                        )
-                        return await Save().constructor(user_save["save"])
-                    except Exception as err:
-                        logger.warning("[phi-plugin] API ERR", e=err)
-
         sessionToken = await getSave.get_user_token(session.user.id)
-
         if not sessionToken:
-            if send:
-                await cls.sendWithAt(
-                    matcher,
-                    "请先绑定sessionToken哦！\n"
-                    "如果不知道自己的sessionToken可以尝试扫码绑定嗷！\n"
-                    f"获取二维码：{PluginConfig.get('cmdhead')} bind qrcode\n"
-                    f"帮助：{PluginConfig.get('cmdhead')} tk help\n"
-                    f"格式：{PluginConfig.get('cmdhead')} bind <sessionToken>",
-                )
+            await send.send_with_At(
+                matcher,
+                session,
+                UniMessage(
+                    i18nList.common.haveToBind.format(
+                        prefix=getInfo.getCmdPrefix(session)
+                    )
+                ),
+            )
             return None
-
-        user_save = (
-            await getUpdateSave.getNewSaveFromLocal(matcher, session, sessionToken)
-        )["save"]
-
+        user_save = await getSave.getSave(session.user.id)
         if not user_save or (
             ver and (not user_save.Recordver or user_save.Recordver < ver)
         ):
-            if send:
-                await cls.sendWithAt(
-                    matcher,
-                    f"请先更新数据哦！\n格式：{PluginConfig.get('cmdhead')} update",
-                )
-            return None
-
-        return await Save().constructor(user_save)
-
-    @classmethod
-    async def pickSend(cls, matcher, msg: list[Text | Image]):
-        """
-        转发到私聊
-
-        :param session: 会话对象
-        :param list[Text | Image] | Text msg: 消息内容
-        """
-        try:
-            await matcher.send(
-                MessageUtils.alc_forward_msg(
-                    msg,
-                    "80000000",
-                    "匿名消息",
-                )  # type: ignore
+            await send.send_with_At(
+                matcher,
+                session,
+                UniMessage(
+                    i18nList.common.haveToUpdate.format(
+                        prefix=getInfo.getCmdPrefix(session)
+                    )
+                ),
             )
-        except Exception as err:
-            logger.error("消息转发失败", "phi-plugin", e=err)
-            await cls.sendWithAt(matcher, "转发失败QAQ！请尝试在私聊触发命令！")
+            return None
+        return user_save
+
+    @staticmethod
+    async def isBan(matcher: AlconnaMatcher, session: Uninfo, fnc: allFnc) -> bool:
+        """
+        该功能是否被ban
+
+        :param fnc: 指令名称
+        """
+        if ensure_group(session) and await getBanGroup.get(session.scene.id, fnc):
+            await send.send_with_At(
+                matcher, session, UniMessage(i18nList.common.beGroupBan)
+            )
+            return True
+        return False

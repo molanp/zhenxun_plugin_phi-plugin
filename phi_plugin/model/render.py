@@ -3,10 +3,9 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from nonebot_plugin_htmlrender import html_to_pic
 
-from ..config import VERSION
+from ..components.Config import VERSION
 from ..components.pluginPath import imgPath, pluginResources
 
-# 配置 Jinja2（启用异步模式）
 env = Environment(
     loader=FileSystemLoader(pluginResources),
     autoescape=False,
@@ -14,8 +13,8 @@ env = Environment(
 )
 
 
-async def render(cls, path: str | Path, params: dict):
-    """渲染 HTML 并转换为图片（异步支持）"""
+async def render(cls, path: str | Path, params: dict) -> bytes:
+    """渲染 HTML 并转换为图片"""
     if isinstance(path, str):
         path = Path(path)
     app, tpl = path.parts

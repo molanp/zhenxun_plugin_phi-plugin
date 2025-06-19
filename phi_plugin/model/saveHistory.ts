@@ -1,20 +1,8 @@
 import { Level } from "../constNum"
 import LevelRecordInfo from "./LevelRecordInfo";
-import Save from "./Save"
+import Save from "./cls/Save"
 import { idString, levelKind } from "../type/type";
 import { fCompute } from "..";
-
-export default interface saveHistory {
-    /**data货币变更记录 */
-    data: { date: Date, value: number[] }[],
-    /**rks变更记录 */
-    rks: { date: Date, value: number }[],
-    /**历史成绩 */
-    scoreHistory: { [key: idString]: { [key in levelKind]?: [number, number, Date, boolean][] } },
-    /**民间考核 */
-    dan: any[],
-    version: number
-}
 
 export default class saveHistory {
 

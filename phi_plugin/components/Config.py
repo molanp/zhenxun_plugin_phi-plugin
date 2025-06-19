@@ -1,16 +1,17 @@
 from pathlib import Path
 from typing import Any
 
-from zhenxun.configs.config import Config as PluginConfig
-from zhenxun.configs.utils import RegisterConfig
 from pydantic import BaseModel
 
-PATH = Path(__file__).parent
+from zhenxun.configs.config import Config as PluginConfig
+from zhenxun.configs.utils import RegisterConfig
+
+PATH = Path(__file__).parent.parent
 
 VERSION = "0.1.0"
 
 
-class PhiConfig(BaseModel):
+class config(BaseModel):
     onLinePhiIllUrl: str = "https://gitee.com/Steveeee-e/phi-plugin-ill/raw/main/"
     """
     在线曲绘来源。仅在未下载曲绘时有效，不影响下载曲绘指令。
@@ -40,7 +41,7 @@ class PhiConfig(BaseModel):
     """系统设置|频道模式，开启后文字版仅限私聊，关闭文字版图片，文字版将折叠为长消息"""
     TapTapLoginQRcode: bool = True
     """系统设置|登录TapTap绑定是否发送二维码，开启仅发送二维码，关闭直接发送链接"""
-    cmdhead: str = "phi"
+    cmdhead: str = "/phi"
     """系统设置|命令头"""
     GuessTipCd: int = 15
     """猜曲绘设置|猜曲绘提示间隔，单位：秒"""
@@ -48,22 +49,9 @@ class PhiConfig(BaseModel):
     """猜曲绘设置|是否在下一条提示发出的时候撤回上一条"""
     LetterNum: int = 8
     """开字母设置|开字母条数"""
-    VikaToken: str | None = None
+    VikaToken: str = ""
     """其他设置|VikaToken,填写后请重载配置"""
 
-
-CONFIG = [
-    RegisterConfig(
-        key=name,
-        value=getattr(PhiConfig, name),
-        help=getattr(getattr(PhiConfig, name).__class__, f"__doc__{name}__", ""),
-    )
-    for name in dir(PhiConfig)
-    if not name.startswith("_")
-]
-
-
-class _ConfigProxy:
     def __getattr__(self, name: str) -> Any:
         """获取配置项"""
         return PluginConfig.get_config("phi_plugin", name.upper())
@@ -73,4 +61,12 @@ class _ConfigProxy:
         PluginConfig.set_config("phi_plugin", name.upper(), value, True)
 
 
-Config = _ConfigProxy()
+CONFIG = [
+    RegisterConfig(
+        key=name,
+        value=getattr(config, name),
+        help=getattr(getattr(config, name).__class__, f"__doc__{name}__", ""),
+    )
+    for name in dir(config)
+    if not name.startswith("_")
+]

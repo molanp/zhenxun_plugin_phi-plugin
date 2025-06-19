@@ -1,4 +1,4 @@
-from typing import NewType, Literal
+from typing import Literal, NewType
 
 idString = NewType("idString", str)
 songString = NewType("songString", str)

@@ -1,9 +1,10 @@
-from .type import idString, songString
-from ..cls.Chart import Chart
 from pydantic import BaseModel
 
+from ..cls.Chart import ChartModel
+from .type import idString, songString
 
-class SongsInfo(BaseModel):
+
+class SongsInfoModel(BaseModel):
     id: idString
     song: songString
     illustration: str
@@ -18,4 +19,4 @@ class SongsInfo(BaseModel):
     length: str
     illustrator: str
     spinfo: str
-    chart: dict[str, Chart]
+    chart: dict[str, ChartModel]

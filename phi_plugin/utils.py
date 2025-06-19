@@ -32,7 +32,7 @@ def to_dict(c: Any) -> dict:
     return dict(convert(c))
 
 
-def Date(date_input: str | float | None) -> datetime:
+def Date(date_input: datetime | str | float | None) -> datetime:
     """
     将多种格式的时间输入转换为 Python datetime 对象，并始终使用本地时区
 
@@ -41,7 +41,11 @@ def Date(date_input: str | float | None) -> datetime:
     """
     if date_input is None:
         return datetime.fromtimestamp(0)
-
+    if isinstance(date_input, datetime):
+        dt = date_input
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone()
     try:
         if isinstance(date_input, str):
             # 优先尝试直接解析带时区的 ISO 格式（含 Z）
@@ -65,7 +69,7 @@ def Date(date_input: str | float | None) -> datetime:
                 except ValueError:
                     continue
 
-        elif isinstance(date_input, (float, int)):
+        elif isinstance(date_input, float | int):
             timestamp = float(date_input)
             if timestamp < 0:
                 return datetime.fromtimestamp(0)
@@ -79,7 +83,7 @@ def Date(date_input: str | float | None) -> datetime:
     return datetime.fromtimestamp(0)
 
 
-def Rating(score: int | None, fc: bool):
+def Rating(score: float | None, fc: bool):
     if score is None:
         return "NEW"
     elif fc:

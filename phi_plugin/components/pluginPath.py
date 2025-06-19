@@ -1,6 +1,6 @@
 from zhenxun.configs.path_config import DATA_PATH
 
-from ..config import PATH
+from .Config import PATH
 
 pluginResources = PATH / "resources"
 """插件资源目录"""

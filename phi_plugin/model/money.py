@@ -1,7 +1,7 @@
-from .getdata import getdata
+from .getdata import get
 
 
 class money:
     @staticmethod
-    async def getNoteNum(user_id: str):
-        return await getdata.getpluginData(user_id)
+    async def getNoteNum(user_id: str) -> int:
+        return await get.getpluginData(user_id)

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Literal
 
 from tortoise import fields
 
@@ -16,19 +16,14 @@ def is_expired(expiration_time: datetime) -> bool:
     return datetime.now() > expiration_time
 
 
-class SstkData(Model):
+class phigrosUserToken(Model):
     """用户 SessionToken 存储"""
 
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
     uid = fields.CharField(255, description="用户ID", unique=True)
     token = fields.CharField(255, description="用户SessionToken")
-    is_banned = fields.BooleanField(
-        default=False,
-        description="是否被封禁",
-        help_text="True: 被封禁, False: 未被封禁",
-    )
 
-    class Meta:
+    class Meta:  # type: ignore
         table = "phigrosUserToken"
         table_description = "Phi 用户Token数据表"
         indexes: ClassVar = [("uid", "token")]
@@ -55,28 +50,45 @@ class SstkData(Model):
         deleted = await cls.filter(uid=uid).delete()
         return deleted > 0
 
-    @classmethod
-    async def ban_sstk(cls, uid: str) -> bool:
-        updated = await cls.filter(uid=uid, is_banned=False).update(is_banned=True)
-        return updated > 0
+
+class phigrosBanSessionToken(Model):
+    """用户BanSessionToken 存储"""
+
+    id = fields.IntField(pk=True, generated=True, auto_increment=True)
+    sessionToken = fields.CharField(255, description="SessionToken", unique=True)
+
+    class Meta:  # type: ignore
+        table = "phigrosBanSessionToken"
+        table_description = "Phi 用户Token封禁表"
+        indexes: ClassVar = [("sessionToken",)]
 
     @classmethod
-    async def unban_sstk(cls, uid: str) -> bool:
-        updated = await cls.filter(uid=uid, is_banned=True).update(is_banned=False)
-        return updated > 0
+    async def _exists(cls, **filters) -> bool:
+        return await cls.filter(**filters).exists()
 
     @classmethod
-    async def is_ban(cls, session_token: str) -> bool:
-        data = await cls.get_or_none(token=session_token, is_banned=True)
-        return bool(data)
+    async def ban_session_token(cls, session_token: str) -> bool:
+        await cls.update_or_create(
+            sessionToken=session_token,
+            defaults={"sessionToken": session_token},
+        )
+        return True
 
     @classmethod
-    async def get_ban_sstk(cls) -> list[str]:
-        data = await cls.filter(is_banned=True).values_list("token", flat=True)
-        return list(data)
+    async def unban_session_token(cls, session_token: str) -> bool:
+        deleted = await cls.filter(sessionToken=session_token).delete()
+        return deleted > 0
+
+    @classmethod
+    async def get_banned_session_tokens(cls) -> list[str]:
+        return [token.sessionToken for token in await cls.all()]
+
+    @classmethod
+    async def is_banned(cls, session_token: str) -> bool:
+        return await cls._exists(sessionToken=session_token)
 
 
-class RksRank(Model):
+class phigrosUserRks(Model):
     """用户RKS排名"""
 
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
@@ -86,7 +98,7 @@ class RksRank(Model):
         auto_now=True, timezone=False, description="最后更新时间"
     )
 
-    class Meta:
+    class Meta:  # type: ignore
         table = "phigrosUserRks"
         table_description = "Phi RKS数据表"
         indexes: ClassVar = [("token", "rks")]
@@ -145,7 +157,7 @@ class RksRank(Model):
         return await query.values()
 
 
-class BannedGroup(Model):
+class phigrosBanGroup(Model):
     """群组功能禁用设置"""
 
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
@@ -165,13 +177,15 @@ class BannedGroup(Model):
     setting = fields.BooleanField(default=False, description="设置功能")
     dan = fields.BooleanField(default=False, description="段位认证功能")
 
-    class Meta:
+    class Meta:  # type: ignore
         table = "phigrosBanGroup"
         table_description = "Phi 群组封禁功能表"
 
     @classmethod
-    async def getStatus(cls, group_id: str, func: str) -> bool:
-        if func not in [
+    async def getStatus(
+        cls,
+        group_id: str,
+        func: Literal[
             "help",
             "bind",
             "b19",
@@ -185,9 +199,8 @@ class BannedGroup(Model):
             "sign",
             "setting",
             "dan",
-        ]:
-            return False
-
+        ],
+    ) -> bool:
         record = await cls.get_or_none(group_id=group_id)
         return getattr(record, func, False) if record else False
 
@@ -203,7 +216,7 @@ class BannedGroup(Model):
         if not created:
             if getattr(record, func, False):
                 return False
-            await record.update(**{func: True})
+            await cls.filter(group_id=group_id).update(**{func: True})
 
         return True
 
@@ -219,11 +232,11 @@ class BannedGroup(Model):
         if not getattr(record, func, False):
             return False
 
-        await record.update(**{func: False})
+        await cls.filter(group_id=group_id).update(**{func: False})
         return True
 
 
-class JrrpData(Model):
+class phigrosJrrp(Model):
     """今日人品数据 (对应 phigrosJrrp 表)"""
 
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
@@ -233,7 +246,7 @@ class JrrpData(Model):
         description="过期时间", default=calculate_jrrp_expiration, timezone=False
     )
 
-    class Meta:
+    class Meta:  # type: ignore
         table = "phigrosJrrp"
         table_description = "Phi 今日人品记录表"
 
@@ -250,8 +263,8 @@ class JrrpData(Model):
         if is_expired(jrrp.expiration_time):
             await cls.del_jrrp(user_id)
             return []
-        assert isinstance(jrrp.content, list)
-        return jrrp.content
+        assert isinstance(jrrp.value, list)
+        return jrrp.value
 
     @classmethod
     async def set_jrrp(cls, uid: str, content: list[Any]) -> bool:

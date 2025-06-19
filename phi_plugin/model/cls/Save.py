@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import Any
+
 from nonebot.compat import PYDANTIC_V2, ConfigDict, field_validator
 from pydantic import BaseModel, Field
 
-from ....utils import Date
-from ...type.type import idString
-from .LevelRecordInfo import LevelRecordInfo
+from ...utils import Date
+from .LevelRecordInfo import LevelRecordInfoModel
+from .type import idString
 
 
 class GameFile(BaseModel):
@@ -54,7 +55,8 @@ class ModifiedAt(BaseModel):
 
     if PYDANTIC_V2:
         model_config: ConfigDict = ConfigDict(  # type: ignore
-            validate_by_name=True, validate_by_alias=True  # type: ignore
+            validate_by_name=True,
+            validate_by_alias=True,  # type: ignore
         )
     else:
 
@@ -109,7 +111,8 @@ class UserInfo(BaseModel):
 
     if PYDANTIC_V2:
         model_config: ConfigDict = ConfigDict(  # type: ignore
-            validate_by_name=True, validate_by_alias=True  # type: ignore
+            validate_by_name=True,
+            validate_by_alias=True,  # type: ignore
         )
     else:
 
@@ -216,7 +219,7 @@ class SaveModel(BaseModel):
     "游戏进度"
     gameuser: GameUser | None = None
     "用户配置"
-    gameRecord: dict[idString, list[LevelRecordInfo | None]] | None = None
+    gameRecord: dict[idString, list[LevelRecordInfoModel | None]] | None = None
     "成绩记录"
 
     @field_validator("modifiedAt")

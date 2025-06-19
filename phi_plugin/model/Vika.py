@@ -2,7 +2,6 @@ import re
 
 from zhenxun.services.log import logger
 
-from ..config import PluginConfig
 from ..vika import Vika
 
 cfg = {
@@ -12,16 +11,16 @@ cfg = {
 }
 
 
-class _VikaData:
+class VikaData:
     def __init__(self, token: str):
         self.vika = Vika(token=token, field_key="id")
         self.PhigrosDan = self.vika.datasheet("dstkfifML5zGiURp6h")
 
-    async def GetUserDanBySstk(self, session_token: str) -> list[dict] | None:
+    async def GetUserDanBySstk(self, sessionToken: str) -> list[dict] | None:
         """通过 sessionToken 获取用户的民间段位数据"""
         try:
             response = await self.PhigrosDan.records.query(  # type: ignore
-                {**cfg, "filterByFormula": f"{{fldB7Wx6wHX57}} = '{session_token}'"}
+                {**cfg, "filterByFormula": f"{{fldB7Wx6wHX57}} = '{sessionToken}'"}
             )
             if response.success:
                 return make_response(response)
@@ -29,11 +28,11 @@ class _VikaData:
             logger.error(f"Error in GetUserDanBySstk: {e!s}")
         return None
 
-    async def GetUserDanById(self, object_id: str) -> list[dict] | None:
+    async def GetUserDanById(self, objectId: str) -> list[dict] | None:
         """通过 ObjectId 获取用户的民间段位数据"""
         try:
             response = await self.PhigrosDan.records.query(  # type: ignore
-                {**cfg, "filterByFormula": f"{{fld9mDj3ktKD7}} = '{object_id}'"}
+                {**cfg, "filterByFormula": f"{{fld9mDj3ktKD7}} = '{objectId}'"}
             )
             if response.success:
                 return make_response(response)
@@ -86,6 +85,3 @@ def make_response(response) -> list[dict] | None:
             }
         )
     return sorted(result, key=lambda x: -x["dan_num"]) if result else None
-
-
-VikaData = _VikaData(PluginConfig.get("VikaToken"))
