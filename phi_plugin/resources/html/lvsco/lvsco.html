@@ -1,72 +1,330 @@
-{% extends defaultLayout %} {% block css %}
-<link rel="stylesheet" href="{{ _res_path }}html/list/list.css" />
-{% endblock %} {% block main %}
-<div class="head_title">
-  <p>{{ head_title }}</p>
-</div>
+{% extends "defaultLayout" %}
 
-<div class="list_box">
-  {% for line in song %}
-  <div class="line">
-    <div class="song_name">
-      <div class="num"><span name="pvis">{{ loop.index + 1 }}</span></div>
-      <div class="song">
-        <span name="pvis">{{ line.song }} - {{ line.composer }}</span>
-      </div>
-      <div class="dif {{ line.rank }}">
-        <span name="pvis">{{ line.difficulty }}</span>
-      </div>
-    </div>
-    <div class="ill_box">
-      <img src="{{ line.illustration }}" alt="{{ line.illustration }}" />
-    </div>
-    <div class="info_box">
-      <div class="down">
-        <div class="acc">
-          <div class="box-content">
-            {{ "%.4f"|format(line.acc) if line.acc else '---' }}%
-          </div>
-          <div class="suggest">
-            > {{ line.suggest if line.suggest else '---' }}
-          </div>
+{% block css %}
+<link rel="stylesheet" href="{{ _res_path }}html/lvsco/lvsco.css">
+{% endblock %}
+
+{% block main %}
+
+    <div class="full-box">
+        <div class="left">
+            <div class="left-top">
+                <img src="{{ illustration }}" alt="{{ illustration }}">
+            </div>
+            <div class="left-content">
+                <div class="left-content-left">
+                </div>
+                <div class="left-content-right"></div>
+            </div>
+            <div class="left-mid">
+                <div class="left-mid-box-{{ 'true' if tot.at else 'false' }}">
+                    <div class="rank-left">
+                        <p>AT</p>
+                    </div>
+                    {% if tot.at %}
+                    <div class="rank-right">
+                        <p>{{ tot.at }} charts</p>
+                        <p>{{ real.at }} unlocked</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="left-mid-box-{{ 'true' if tot.in else 'false' }}">
+                    <div class="rank-left">
+                        <p>IN</p>
+                    </div>
+                    {% if tot.in %}
+                    <div class="rank-right">
+                        <p>{{ tot.in }} charts</p>
+                        <p>{{ real.in }} unlocked</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="left-mid-box-{{ 'true' if tot.hd else 'false' }}">
+                    <div class="rank-left">
+                        <p>HD</p>
+                    </div>
+                    {% if tot.hd %}
+                    <div class="rank-right">
+                        <p>{{ tot.hd }} charts</p>
+                        <p>{{ real.hd }} unlocked</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="left-mid-box-{{ 'true' if tot.ez else 'false' }}">
+                    <div class="rank-left">
+                        <p>EZ</p>
+                    </div>
+                    {% if tot.ez %}
+                    <div class="rank-right">
+                        <p>{{ tot.ez }} charts</p>
+                        <p>{{ real.ez }} unlocked</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="left-mid-bottom"></div>
+            <div class="createdbox">
+                <div class="phi-plugin">
+                    <p>{{ _plugin }}</p>
+                </div>
+                <div class="ver">
+                    <p>{{ Version.ver }}</p>
+                </div>
+            </div>
         </div>
-        <div class="score_rating">
-          <div class="score">{{ line.score }}</div>
-          <div class="rating">
-            <img
-              src="{{ _res_path }}html/otherimg/{{ line.Rating if line.Rating else 'NEW' }}.png"
-              alt="{{ line.Rating }}"
-            />
-          </div>
+        <div class="left-up">
+            <div class="left-top">
+                <div class="illustration">
+                    <img src="{{ illustration }}" alt="{{ illustration }}">
+                </div>
+                <div class="user_info">
+                    <div class="info_up">
+                        <div class="avatar">
+                            <img src="{{ _res_path }}html//avatar/{{ avatar }}.png" alt="{{ avatar }}">
+                        </div>
+                        <div class="basic_info">
+                            <div class="user_name">
+                                <p name="pvis">{{ PlayerId }}</p>
+                            </div>
+                            <div class="user_rks">
+                                <div class="player_rks">
+                                    <p>{{ "%.4f"|format(rks) }}</p>
+                                </div>
+                                <div class="Challenge">
+                                    <img src="{{ _res_path }}html//otherimg/{{ ChallengeMode }}.png" alt="{{ ChallengeMode }}">
+                                    <p>{{ ChallengeModeRank }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user_info_right"></div>
+                    </div>
+                </div>
+                <div class="difficulty_box">
+                    <div class="difficulty_box_p">
+                        <p>已选定数区间</p>
+                    </div>
+                    <div class="difficulty_value" style="margin-left: {{ range.left }}%;">
+                        <p>{{ range.bottom }}</p>
+                    </div>
+                    <div class="difficulty_bar-out">
+                        <div class="difficulty_bar-in" style="margin-left: {{ range.left }}%;width: {{ range.length }}%;"></div>
+                    </div>
+                    <div class="difficulty_value" style="margin-left: {{ range.left + range.length }}%;">
+                        <p>{{ range.top }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="left-content">
+                <div class="left-content-left">
+                    <p>CONTENT</p>
+                </div>
+                <div class="left-content-right"></div>
+            </div>
+            <div class="left-mid">
+                <div class="left-up-mid-box-{{ 'true' if tot.at else 'false' }}">
+                    <div class="rank-left">
+                        <p>AT</p>
+                    </div>
+                    {% if tot.at %}
+                    <div class="rank-right">
+                        <p>{{ tot.at }} charts</p>
+                        <p>{{ real.at }} unlocked</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="left-up-mid-box-{{ 'true' if tot.in else 'false' }}">
+                    <div class="rank-left">
+                        <p>IN</p>
+                    </div>
+                    {% if tot.in %}
+                    <div class="rank-right">
+                        <p>{{ tot.in }} charts</p>
+                        <p>{{ real.in }} unlocked</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="left-up-mid-box-{{ 'true' if tot.hd else 'false' }}">
+                    <div class="rank-left">
+                        <p>HD</p>
+                    </div>
+                    {% if tot.hd %}
+                    <div class="rank-right">
+                        <p>{{ tot.hd }} charts</p>
+                        <p>{{ real.hd }} unlocked</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="left-up-mid-box-{{ 'true' if tot.ez else 'false' }}">
+                    <div class="rank-left">
+                        <p>EZ</p>
+                    </div>
+                    {% if tot.ez %}
+                    <div class="rank-right">
+                        <p>{{ tot.ez }} charts</p>
+                        <p>{{ real.ez }} unlocked</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="left-up-mid-bottom"></div>
         </div>
-      </div>
+
+        <div class="right" id="{{ rating.tot }}">
+            <div class="file-content">
+                <div class="file-content-left">
+                    <p>FILE_CONTENT</p>
+                </div>
+                <div class="progress_bar-out">
+                    <div class="progress_bar-in-phi" style="width: {{ progress_phi }}%;">
+                        <p>{{ progress_phi }}% PHI.</p>
+                    </div>
+                    <div class="progress_bar-in-fc" style="width: {{ progress_fc - progress_phi }}%;">
+                        <p>{{ progress_fc }}% FullCombo.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="right_title">
+                <p>TOT</p>
+                <div class="title_group">
+                    <div class="title_group-real">
+                        <p>{{ real.songs }}</p>
+                    </div>
+                    <div class="title_group-tot">
+                        <p>/{{ tot.songs }} songs</p>
+                    </div>
+                </div>
+                <div class="title_group">
+                    <div class="title_group-real">
+                        <p>{{ real.charts }}</p>
+                    </div>
+                    <div class="title_group-tot">
+                        <p>/{{ tot.charts }} charts</p>
+                    </div>
+                </div>
+            </div>
+            <div class="right_content">
+                <div class="right_content-title">
+                    <p>收集日期</p>
+                </div>
+                <p>{{ date }}</p>
+                <div class="right_content-title">
+                    <p>保管单位</p>
+                </div>
+                <p>{{ PlayerId }}</p>
+                <div class="right_content-title">
+                    <p>等级</p>
+                </div>
+                <p>{{ "%.8f"|format(rks) }}</p>
+            </div>
+            <div class="tot_Rating">
+                <img src="{{ _res_path }}html/otherimg/{{ rating.tot }}.png" alt="{{ rating.tot }}">
+            </div>
+            <div class="title_group" id="score">
+                <div class="title_group-real" id="real-score">
+                    <p>{{ real.score }}</p>
+                </div>
+                <div class="title_group-tot" id="tot-score">
+                    <p>/{{ tot.score }}</p>
+                </div>
+            </div>
+            <div class="title_group" id="highest">
+                <div class="title_group-real" id="real-highlow">
+                    <p>{{ "%.4f"|format(highest) }}</p>
+                </div>
+                <div class="title_group-tot" id="tot-highlow">
+                    <p>Highest</p>
+                </div>
+            </div>
+            <div class="title_group" id="lowest">
+                <div class="title_group-real" id="real-highlow">
+                    <p>{{ "%.4f"|format(lowest) }}</p>
+                </div>
+                <div class="title_group-tot" id="tot-highlow">
+                    <p>Lowest</p>
+                </div>
+            </div>
+            <div class="tot_acc-box">
+                <div class="tot_acc-left">
+                    {% if rating.tot == 'phi' %}
+                    <span style="color: rgb(255, 253, 44);">{{ tot_acc|int }}</span>
+                    {% elif rating.tot == 'FC' %}
+                    <span style="color: rgb(0, 132, 255);">{{ tot_acc|int }}</span>
+                    {% else %}
+                    <span>{{ tot_acc|int }}</span>
+                    {% endif %}
+                </div>
+                <div class="tot_acc-right">
+                    <span id="acc_word">ACC</span>
+                    {% set acc_frac = ("%.4f"|format(tot_acc % 1)).replace("0.", "") %}
+                    {% if rating.tot == 'phi' %}
+                    <span style="color: rgb(255, 253, 44);">.{{ acc_frac }}%</span>
+                    {% elif rating.tot == 'FC' %}
+                    <span style="color: rgb(0, 132, 255);">.{{ acc_frac }}%</span>
+                    {% else %}
+                    <span>.{{ acc_frac }}%</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stats-rating-group">
+                <div class="rating-group">
+                    <div class="rating-value">
+                        <p>{{ tot_cleared }}</p>
+                    </div>
+                    <div class="rating-tatle">
+                        <p>Cleared</p>
+                    </div>
+                </div>
+                <div class="rating-group">
+                    <div class="rating-value">
+                        <p>{{ tot_fc }}</p>
+                    </div>
+                    <div class="rating-tatle">
+                        <p>FC</p>
+                    </div>
+                </div>
+                <div class="rating-group">
+                    <div class="rating-value">
+                        <p>{{ tot_phi }}</p>
+                    </div>
+                    <div class="rating-tatle">
+                        <p>PHI</p>
+                    </div>
+                </div>
+            </div>
+            <div class="rating_stats">
+                <div class="rating_stats_group">
+                    <img src="{{ _res_path }}html/otherimg/phi.png" alt="phi">
+                    <p>{{ rating.phi }}</p>
+                </div>
+                <div class="rating_stats_group">
+                    <img src="{{ _res_path }}html/otherimg/FC.png" alt="FC">
+                    <p>{{ rating.FC }}</p>
+                </div>
+                <div class="rating_stats_group">
+                    <img src="{{ _res_path }}html/otherimg/V.png" alt="V">
+                    <p>{{ rating.V }}</p>
+                </div>
+                <div class="rating_stats_group">
+                    <img src="{{ _res_path }}html/otherimg/S.png" alt="S">
+                    <p>{{ rating.S }}</p>
+                </div>
+                <div class="rating_stats_group">
+                    <img src="{{ _res_path }}html/otherimg/A.png" alt="A">
+                    <p>{{ rating.A }}</p>
+                </div>
+                <div class="rating_stats_group">
+                    <img src="{{ _res_path }}html/otherimg/B.png" alt="B">
+                    <p>{{ rating.B }}</p>
+                </div>
+                <div class="rating_stats_group">
+                    <img src="{{ _res_path }}html/otherimg/C.png" alt="C">
+                    <p>{{ rating.C }}</p>
+                </div>
+                <div class="rating_stats_group">
+                    <img src="{{ _res_path }}html/otherimg/F.png" alt="F">
+                    <p>{{ rating.F }}</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  {% endfor %}
-</div>
-
-<div class="createdbox">
-  <div class="phi-plugin">
-    <p>{{ _plugin }}</p>
-  </div>
-  <div class="ver">
-    <p>{{ Version.ver }}</p>
-  </div>
-</div>
-
-{% if theme == "snow" %}
-<div class="snow-box"></div>
-<script>
-  themeSnow();
-</script>
-{% elif theme in ["topText", "foolsDay"] %}
-<div class="topTextBox" id="topTextBox"></div>
-<script>
-  themeTopText();
-</script>
-{% elif theme == "star" %}
-<canvas id="stars"></canvas>
-<script>
-  themeStar();
-</script>
-{% endif %} {% endblock %}
+{% endblock %}

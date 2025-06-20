@@ -1,0 +1,152 @@
+{% extends "defaultLayout" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ _res_path }}html/song/song.css">
+{% endblock %}
+
+{% block main %}
+
+    <div class="background" style="background: url({{ illustration }}) no-repeat; background-size: cover;">
+        <img src="{{ illustration }}" alt="曲绘-模糊">
+    </div>
+    <div class="big-box">
+        <div class="box">
+            <div class="info-box">
+                <div class="name-box">
+                    <div class="song">
+                        <p name="pvis">{{ song }}</p>
+                        <!-- <p style="font-size: 45px;">{{ song }}</p> -->
+                    </div>
+                    <div class="composer">
+                        <p name="pvis">{{ composer }}</p>
+                    </div>
+                </div>
+                <div class="charts-box">
+                    <div class="length">
+                        <p name="pvis">{{ length }}</p>
+                    </div>
+                    <div class="txt">
+                        <div class="sqrt">
+                            <p>SONG'S_INFO</p>
+                        </div>
+                        <div class="line">
+                            {% if spinfo %}
+                            <p name="pvis">{{ spinfo | replace('\n', '<br>') | safe }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="chart">
+                        <div class="rankbkg">
+                            <div class="sqr"></div>
+                            {% for key, value in chart.items() %}
+                            <div class="sqr rank-{{ key }}" style="background-color: rgba({{ value.rgba }});"></div>
+                            {% endfor %}
+                        </div>
+                        <div class="rank">
+                            <p>\</p>
+                            {% for key, value in chart.items() %}
+                            <p>{{ key }}</p>
+                            {% endfor %}
+                        </div>
+                        <div class="note-box">
+                            <p>Difficulty</p>
+                            {% for value in chart.values() %}
+                            <p>{{ value.difficulty }}</p>
+                            {% endfor %}
+                        </div>
+                        <div class="rank-box">
+                            <div class="charter">
+                                <p>Charter</p>
+                            </div>
+                            <div class="chart-info"> 
+                                <p>Tap</p>
+                                <p>Drag</p>
+                                <p>Hold</p>
+                                <p>Flicke</p>
+                            </div>
+                            {% for value in chart.values() %}
+                            <div class="charter">
+                                <p name="pvis">{{ value.charter }}</p>
+                            </div>
+                            <div class="chart-info">
+                                <p>{{ value.tap }}</p>
+                                <p>{{ value.drag }}</p>
+                                <p>{{ value.hold }}</p>
+                                <p>{{ value.flicke }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="note-box">
+                            <p>Total</p>
+                            {% for value in chart.values() %}
+                            <p>{{ value.combo }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ill-box">
+                <img src="{{ illustration }}" alt="曲绘">
+            </div>
+        </div>
+        <div class="other-info">
+            <div class="other-box">
+                <div class="title">
+                    <p>BPM</p>
+                </div>
+                <div class="dcr">
+                    <p>{{ bpm }}</p>
+                </div>
+            </div>
+            <div class="other-box">
+                <div class="title">
+                    <p>Illustrator</p>
+                </div>
+                <div class="dcr">
+                    <p>{{ illustrator }}</p>
+                </div>
+            </div>
+            <div class="other-box">
+                <div class="title">
+                    <p>Chapter</p>
+                </div>
+                <div class="dcr">
+                    <p>{{ chapter }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="leave">
+            <div class="leave-box">
+                {% for key, value in chart.items() %}
+                    {% if key == 'EZ' %}
+                    <div class="leave-ez">
+                    {% elif key == 'HD' %}
+                    <div class="leave-hd">
+                    {% elif key == 'IN' %}
+                    <div class="leave-in">
+                    {% elif key == 'AT' %}
+                    <div class="leave-at">
+                    {% elif key == 'SP' %}
+                    <div class="leave-sp">
+                    {% else %}
+                    <div class="leave-sp" style="background-color: rgba({{ value.rgba }});">
+                    {% endif %}
+                        <p name="pvis" style="margin-left: 3px;">{{ value.difficulty }}</p>
+                        <p name="pvis" style="font-size: 15px; margin-right: 13px;">{{ key }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="createdbox">
+    <div class="phi-plugin">
+        <p>{{ _plugin }}</p>
+    </div>
+    <div class="ver">
+        <p>{{ Version.ver }}</p>
+    </div>
+</div>
+<div class="snow-box"> </div>
+
+{% endblock %}

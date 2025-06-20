@@ -1,19 +1,14 @@
-import asyncio
 import csv
 from io import StringIO
 from pathlib import Path
-from typing import Any, Literal, cast
+import re
+from typing import Any
 
 import aiofiles
 from ruamel.yaml import YAML
-import ujson as json
+import ujson
 
-from zhenxun.services.log import logger
-
-from .getRksRank import getRksRank
-from ..components.pluginPath import dataPath, pluginDataPath, savePath
-
-SUPPORTED_FORMATS = Literal["JSON", "YAML", "CSV", "TXT"]
+from ..components.Logger import logger
 
 
 async def csv_write(file_path: str | Path, data: list[dict[str, Any]]):
@@ -72,4 +67,114 @@ async def csv_read(file_path: str | Path) -> list[dict[str, Any]]:
     return [dict(row) for row in reader]
 
 
-# TODO: 完善其余方法
+class getFile:
+    @staticmethod
+    def FileReader(
+        filePath: str | Path, style: str | None = None, variables: dict | None = None
+    ):
+        """
+        同步读取文件
+
+        :param filePath: 完整路径
+        :param style: 强制设置文件格式['JSON' , 'YAML' , 'TXT']
+        :param variables: 需要替换的变量对象 例如：{ username: 'John' }
+        """
+        if variables is None:
+            variables = {}
+        if isinstance(filePath, str):
+            filePath = Path(filePath)
+        try:
+            if not filePath.exists():
+                return False
+            if not style:
+                style = filePath.suffix.upper().replace(".", "")
+            match style:
+                case "JSON":
+                    with open(filePath, encoding="utf-8") as f:
+                        return getFile.replaceVariables(
+                            ujson.loads(f.read()), variables
+                        )
+                case "YAML":
+                    with open(filePath, encoding="utf-8") as f:
+                        return getFile.replaceVariables(
+                            YAML().load(f.read()), variables
+                        )
+                case _:
+                    with open(filePath, encoding="utf-8") as f:
+                        return getFile.replaceVariables(f.read(), variables)
+        except Exception as e:
+            logger.error(f"[{filePath}] 读取失败", "phi-plugin", e=e)
+            return None
+
+    @staticmethod
+    def replaceVariables(content: Any, variables: dict):
+        """
+        替换文本中的占位符
+
+        :param content: 内容
+        :param variables: 需要替换的变量字典
+        """
+        if not variables:
+            return content
+
+        if isinstance(content, str):
+            return re.sub(
+                r"\{(\w+)\}",
+                lambda match: variables.get(match.group(1), f"{{{match.group(1)}}}"),
+                content,
+            )
+        if isinstance(content, dict):
+            for key, value in content.items():
+                content[key] = getFile.replaceVariables(value, variables)
+            return content
+
+        return content
+
+    @staticmethod
+    async def csvReader(filePath: str | Path):
+        return await csv_read(filePath)
+
+    @staticmethod
+    def SetFile(filePath: str | Path, data: Any, style: str | None = None):
+        """
+        储存文件
+
+        :param filePath: 文件路径
+        :param data: 目标数据
+        :param style: 强制设置文件格式['JSON' , 'YAML' , 'TXT']
+        """
+        if isinstance(filePath, str):
+            filePath = Path(filePath)
+        try:
+            fatherPath = filePath.parent
+            if not fatherPath.exists():
+                fatherPath.mkdir(parents=True)
+            if not style:
+                style = filePath.suffix.upper().replace(".", "")
+            match style:
+                case "JSON":
+                    with open(filePath, "w", encoding="utf-8") as f:
+                        f.write(ujson.dumps(data))
+                case "YAML":
+                    with open(filePath, "w", encoding="utf-8") as f:
+                        f.write(YAML().dump(data))
+                case _:
+                    with open(filePath, "w", encoding="utf-8") as f:
+                        f.write(data)
+            return True
+        except Exception as e:
+            logger.error(f"写入文件 {filePath} 失败", "phi-plugin", e=e)
+            return False
+
+    @staticmethod
+    def DelFile(path: str | Path):
+        if isinstance(path, str):
+            path = Path(path)
+        try:
+            if not path.exists():
+                return False
+            path.unlink()
+            return True
+        except Exception as e:
+            logger.error(f"[{path}] 删除失败", "phi-plugin", e=e)
+            return False

@@ -1,72 +1,79 @@
-{% extends defaultLayout %} {% block css %}
-<link rel="stylesheet" href="{{ _res_path }}html/list/list.css" />
-{% endblock %} {% block main %}
-<div class="head_title">
-  <p>{{ head_title }}</p>
-</div>
+{% extends "defaultLayout" %}
 
-<div class="list_box">
-  {% for line in song %}
-  <div class="line">
-    <div class="song_name">
-      <div class="num"><span name="pvis">{{ loop.index + 1 }}</span></div>
-      <div class="song">
-        <span name="pvis">{{ line.song }} - {{ line.composer }}</span>
-      </div>
-      <div class="dif {{ line.rank }}">
-        <span name="pvis">{{ line.difficulty }}</span>
-      </div>
+{% block css %}
+<link rel="stylesheet" href="{{ _res_path }}html/list/list.css">
+{% endblock %}
+
+{% block main %}
+
+    <div class="head_title">
+        <p>{{ head_title }}</p>
     </div>
-    <div class="ill_box">
-      <img src="{{ line.illustration }}" alt="{{ line.illustration }}" />
-    </div>
-    <div class="info_box">
-      <div class="down">
-        <div class="acc">
-          <div class="box-content">
-            {{ "%.4f"|format(line.acc) if line.acc else '---' }}%
-          </div>
-          <div class="suggest">
-            > {{ line.suggest if line.suggest else '---' }}
-          </div>
+
+    <div class="list_box">
+        {# 遍历 song 列表 #}
+        {% for line in song %}
+        <div class="line">
+            <div class="song_name">
+                <div class="num"><span name="pvis">{{ loop.index }}</span></div>
+                <div class="song"><span name="pvis">{{ line.song }} - {{ line.composer }}</span></div>
+                <div class="dif {{ line.rank }}"><span name="pvis">{{ line.difficulty }}</span></div>
+            </div>
+            <div class="ill_box">
+                <img src="{{ line.illustration }}" alt="{{ line.illustration }}">
+            </div>
+            <div class="info_box">
+                <div class="down">
+                    <div class="acc">
+                        <div class="box-content">
+                            {# acc 为空时显示 '---'，否则保留四位小数 #}
+                            {{ ('%.4f' % line.acc) if line.acc is not none else '---' }}%
+                        </div>
+                        <div class="suggest">&gt; {{ line.suggest if line.suggest else '---' }}</div>
+                    </div>
+                    <div class="score_rating">
+                        <div class="score">{{ line.score }}</div>
+                        <div class="rating">
+                            <img src="{{ _res_path }}html/otherimg/{{ line.Rating if line.Rating else 'NEW' }}.png"
+                                alt="{{ line.Rating }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="score_rating">
-          <div class="score">{{ line.score }}</div>
-          <div class="rating">
-            <img
-              src="{{ _res_path }}html/otherimg/{{ line.Rating if line.Rating else 'NEW' }}.png"
-              alt="{{ line.Rating }}"
-            />
-          </div>
-        </div>
-      </div>
+        {% endfor %}
     </div>
-  </div>
-  {% endfor %}
-</div>
-
-<div class="createdbox">
-  <div class="phi-plugin">
-    <p>{{ _plugin }}</p>
-  </div>
-  <div class="ver">
-    <p>{{ Version.ver }}</p>
-  </div>
-</div>
-
-{% if theme == "snow" %}
-<div class="snow-box"></div>
-<script>
-  themeSnow();
-</script>
-{% elif theme in ["topText", "foolsDay"] %}
-<div class="topTextBox" id="topTextBox"></div>
-<script>
-  themeTopText();
-</script>
-{% elif theme == "star" %}
-<canvas id="stars"></canvas>
-<script>
-  themeStar();
-</script>
-{% endif %} {% endblock %}
+    <div class="createdbox">
+        <div class="phi-plugin">
+            <p>{{ _plugin }}</p>
+        </div>
+        <div class="ver">
+            <p>{{ Version.ver }}</p>
+        </div>
+    </div>
+    {% if theme == "snow" %}
+    <div class="snow-box"> </div>
+    <script>
+        function addSnow() {
+            var snow = document.createElement("div")
+            snow.innerHTML = `<img src="{{ _res_path }}html/otherimg/snow${Math.floor(Math.random() * 4) + 1}.png">`
+            snow.className = "snow"
+            snow.style.left = `${Math.random() * 100}%`
+            snow.style.bottom = `${Math.random() * 100}%`
+            snow.style.width = `${Math.random() * 4}%`
+            snow.style.rotate = `${Math.random() * 360}deg`
+            snow.style.transform = `rotate3d(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random() * 360}deg)`
+            snow.style.filter = `blur(${Math.random() * 2}px)`
+            const tar = document.getElementsByClassName("snow-box")[0]
+            tar.appendChild(snow)
+        }
+        var sum = Math.floor(Math.random() * 100) + 50
+        while (sum--) {
+            addSnow()
+        }
+    </script>
+    {% elif theme == "star" %}
+    <canvas id="stars"></canvas>
+    <script src="{{ _res_path }}html/common/star.js"></script>
+    {% endif %}
+{% endblock %}

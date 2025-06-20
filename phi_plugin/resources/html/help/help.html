@@ -1,71 +1,89 @@
-{% extends defaultLayout %} {% block css %}
-<link rel="stylesheet" href="{{ _res_path }}html/help/help.css" />
-{% endblock %} {% block main %} {% for group in helpGroup %} {% if group.auth !=
-"master" or isMaster %} {% set len = group.list | length %}
-<div class="help_box">
-  <div class="help-group">——·{{ group.group }}·——</div>
-  {% if len > 0 %} {% for help in group.list %}
-  <div class="line">
-    <div class="order">
-      {% if cmdHead %}
-      <p name="pvis">{{ help.title | replace('/',  cmdHead ~ ' ') }}</p>
-      {% else %}
-      <p name="pvis">{{ help.title }}</p>
-      {% endif %}
-    </div>
-    <div class="info_box">
-      <div class="up">
-        <div class="num">{{ loop.index }}</div>
-        <div class="song">
-          {% if cmdHead %}
-          <p name="pvis">
-            {{ (help.eg or help.title) | replace('/', cmdHead ~ ' ') }}
-          </p>
-          {% else %}
-          <p name="pvis">{{ help.eg or help.title }}</p>
-          {% endif %}
-        </div>
-      </div>
-      <div class="down">
-        <div class="desc">
-          {% if help.desc %}
-          <p name="pvis">{{ help.desc | replace('/', cmdHead ~ ' ')}}</p>
-          {% endif %} {% if help.img %}
-          <img
-            src="{{ _res_path }}html/otherimg/{{ help.img }}"
-            alt="{{ help.img }}"
-          />
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endfor %} {% endif %}
-</div>
-{% endif %} {% endfor %}
+{% extends "defaultLayout" %}
 
-<div class="createdbox">
-  <div class="phi-plugin">
-    <p>{{ _plugin }}</p>
-  </div>
-  <div class="ver">
-    <p>{{ Version.ver }}</p>
-  </div>
-</div>
+{% block css %}
+<link rel="stylesheet" href="{{ _res_path }}html/help/help.css">
+{% endblock %}
 
-{% if theme == "snow" %}
-<div class="snow-box"></div>
-<script>
-  themeSnow();
-</script>
-{% elif theme in ["topText", "foolsDay"] %}
-<div class="topTextBox" id="topTextBox"></div>
-<script>
-  themeTopText();
-</script>
-{% elif theme == "star" %}
-<canvas id="stars"></canvas>
-<script>
-  themeStar();
-</script>
-{% endif %} {% endblock %}
+{% block main %}
+
+    {# 遍历 helpGroup #}
+    {% for group in helpGroup %}
+        {# 权限判断 #}
+        {% if group.auth != "master" or isMaster %}
+            {% set len = group.list|length if group.list is defined else 0 %}
+            <div class="help_box">
+                <div class="help-group">——·{{ group.group }}·——</div>
+                {% if len > 0 %}
+                    {% for help in group.list %}
+                    <div class="line">
+                        <div class="order">
+                            {% if cmdHead %}
+                                <p name="pvis">{{ help.title | replace(r'[\/杠钢刚]', '/' ~ cmdHead ~ ' ') }}</p>
+                            {% else %}
+                                <p name="pvis">{{ help.title }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="info_box">
+                            <div class="up">
+                                <div class="num">{{ loop.index }}</div>
+                                <div class="song">
+                                    {% if cmdHead %}
+                                        <p name="pvis">{{ (help.eg or help.title) | replace(r'[\/杠钢刚]', '/' ~ cmdHead ~ ' ') }}</p>
+                                    {% else %}
+                                        <p name="pvis">{{ help.eg or help.title }}</p>
+                                    {% endif %}
+                                </div>
+                                <!-- <div class="Master">Master</div> -->
+                            </div>
+                            <div class="down">
+                                <div class="desc">
+                                    {% if help.desc %}
+                                        <p name="pvis">{{ help.desc | replace(' ', '&ensp;') | safe }}</p>
+                                    {% endif %}
+                                    {% if help.img %}
+                                        <img src="{{ _res_path }}html/otherimg/{{ help.img }}" alt="{{ help.img }}">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <div class="createdbox">
+        <div class="phi-plugin">
+            <p>{{ _plugin }}</p>
+        </div>
+        <div class="ver">
+            <p>{{ Version.ver }}</p>
+        </div>
+    </div>
+    {% if theme == "snow" %}
+    <div class="snow-box"> </div>
+    <script>
+        function addSnow() {
+            var snow = document.createElement("div")
+            snow.innerHTML = `<img src="{{ _res_path }}html/otherimg/snow${Math.floor(Math.random() * 4) + 1}.png">`
+            snow.className = "snow"
+            snow.style.left = `${Math.random() * 100}%`
+            snow.style.bottom = `${Math.random() * 100}%`
+            snow.style.width = `${Math.random() * 4}%`
+            snow.style.rotate = `${Math.random() * 360}deg`
+            snow.style.transform = `rotate3d(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random() * 360}deg)`
+            snow.style.filter = `blur(${Math.random() * 2}px)`
+            const tar = document.getElementsByClassName("snow-box")[0]
+            tar.appendChild(snow)
+        }
+        var sum = Math.floor(Math.random() * 100) + 50
+        while (sum--) {
+            addSnow()
+        }
+    </script>
+    {% elif theme == "star" %}
+    <canvas id="stars"></canvas>
+    <script src="{{ _res_path }}html/common/star.js"></script>
+    {% endif %}
+{% endblock %}

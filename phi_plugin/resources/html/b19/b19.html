@@ -1,213 +1,248 @@
-{% extends defaultLayout %} {% block css %}
-<link rel="stylesheet" href="{{ _res_path }}html/b19/b19.css" />
-{% endblock %} {% block main %}
+{% extends "defaultLayout" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ _res_path }}html/b19/b19.css">
+{% endblock %}
+
+{% block main %}
+
 <div class="title">
-  <div class="playerInfo">
-    <div class="blackBlock"></div>
-    <div class="avatar">
-      <img
-        src="{{ _res_path }}html/avatar/{{ gameuser.avatar }}.png"
-        alt="{{ gameuser.avatar }}"
-      />
+    <div class="playerInfo">
+        <div class="blackBlock"></div>
+        <div class="avatar">
+            <img src="{{ _res_path }}html/avatar/{{ gameuser.avatar }}.png" alt="{{ gameuser.avatar }}">
+        </div>
+        <div class="playerId">
+            <p name="pvis">{{ gameuser.PlayerId }}</p>
+        </div>
+        <div class="rks">
+            <p>{{ "%.4f"|format(gameuser.rks) }}</p>
+        </div>
+        <div class="clgBox">
+            <div class="Challenge">
+                <img src="{{ _res_path }}html/otherimg/{{ gameuser.ChallengeMode }}.png" alt="Challenge">
+                <p>{{ gameuser.ChallengeModeRank }}</p>
+            </div>
+        </div>
+        <div class="date">
+            <p>{{ Date }}</p>
+        </div>
+        <div class="dataBox">
+            <img src="{{ _res_path }}html/otherimg/data.png" alt="data">
+            <p>{{ gameuser.data }}</p>
+        </div>
     </div>
-    <div class="playerId">
-      <p name="pvis">{{ gameuser.PlayerId }}</p>
+    <div class="recordInfo">
+        <div class="whiteLine"></div>
+        <div class="sheet">
+            <div class="row">
+                <div class="poz">
+                    <p>\</p>
+                </div>
+                {% for v in stats %}
+                <div class="poz">
+                    <p>{{ v.title }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="row">
+                <div class="poz">
+                    <p>C</p>
+                </div>
+                {% for v in stats %}
+                <div class="poz">
+                    <p>{{ v.cleared }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="row">
+                <div class="poz">
+                    <p>FC</p>
+                </div>
+                {% for v in stats %}
+                <div class="poz">
+                    <p>{{ v.fc }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="row">
+                <div class="poz">
+                    <p>Phi</p>
+                </div>
+                {% for v in stats %}
+                <div class="poz">
+                    <p>{{ v.phi }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-    <div class="rks">
-      <p>{{ "%.4f"|format(gameuser.rks) }}</p>
+</div>
+<div class="b19">
+
+    {% for song in phi %}
+    {% if song %}
+    <div class="song phi_song">
+        <div class="ill-box">
+            <div class="num">
+                <p name="pvis">P{{ loop.index }}</p>
+            </div>
+            <div class="ill">
+                <img src="{{ song.illustration }}" alt="ill">
+            </div>
+            <div class="rank-{{ song.rank }}">
+                <div class="org">
+                    <p>{{ song.rank }}&ensp;{{ "%.1f"|format(song.difficulty) }}</p>
+                </div>
+                <div class="rel">
+                    <p>{{ "%.2f"|format(song.rks) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="info-{{ song.rank }}">
+            <div class="songname">
+                <p name="pvis">{{ song.song }}</p>
+            </div>
+            <div class="songinfo">
+                <div class="Rating">
+                    <img src="{{ _res_path }}html/otherimg/{{ song.Rating }}.png" alt="{{ song.Rating }}">
+                </div>
+                <div class="chengji">
+                    <div class="score">
+                        <p>{{ song.score }}</p>
+                    </div>
+                    <div class="line"></div>
+                    <div class="acc-box">
+                        <div class="acc">
+                            <p>{{ "%.2f"|format(song.acc) }}%</p>
+                        </div>
+                        <div class="suggest">
+                            <p>>> {{ song.suggest }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="clgBox">
-      <div class="Challenge">
-        <img
-          src="{{ _res_path }}html/otherimg/{{ gameuser.ChallengeMode }}.png"
-          alt="Challenge"
-        />
-        <p>{{ gameuser.ChallengeModeRank }}</p>
-      </div>
-    </div>
-    <div class="date">
-      <p>{{ Date }}</p>
-    </div>
-    <div class="dataBox">
-      <img src="{{ _res_path }}html/otherimg/data.png" alt="data" />
-      <p>{{ gameuser.data }}</p>
-    </div>
-    {% if spInfo %}
-    <div class="spInfo colorful-background">
-      <p>{{ spInfo }}</p>
+    {% else %}
+    <div class="Nosignal">
+        <div class="border_corner border_corner_left_top"></div>
+        <div class="border_corner border_corner_right_top"></div>
+        <div class="border_corner border_corner_left_bottom"></div>
+        <div class="border_corner border_corner_right_bottom"></div>
+        <div class="line"></div>
+        <div class="timeout">
+            <p>TIME_OUT</p>
+        </div>
+        <div class="client">
+            <p>>>> PhigrOS Client Finding Phi.score</p>
+        </div>
+        <div class="sqrt"></div>
     </div>
     {% endif %}
-  </div>
-  <div class="recordInfo">
-    <div class="whiteLine"></div>
-    <div class="sheet">
-      <div class="row">
-        <div class="poz">
-          <p>\</p>
+    {% endfor %}
+
+    {% for song in b19_list %}
+    {% if loop.index0 == 27 %}
+    <div class="over_flow">
+        <div class="flow_line_box_l">
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
         </div>
-        {% for v in stats %}
-        <div class="poz">
-          <p>{{ v.title }}</p>
+        <p><i>OVER FLOW</i></p>
+        <div class="flow_line_box_r">
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
+            <div class="flow_line"></div>
         </div>
-        {% endfor %}
-      </div>
-      <div class="row">
-        <div class="poz">
-          <p>C</p>
-        </div>
-        {% for v in stats %}
-        <div class="poz">
-          <p>{{ v.cleared }}</p>
-        </div>
-        {% endfor %}
-      </div>
-      <div class="row">
-        <div class="poz">
-          <p>FC</p>
-        </div>
-        {% for v in stats %}
-        <div class="poz">
-          <p>{{ v.fc }}</p>
-        </div>
-        {% endfor %}
-      </div>
-      <div class="row">
-        <div class="poz">
-          <p>Phi</p>
-        </div>
-        {% for v in stats %}
-        <div class="poz">
-          <p>{{ v.phi }}</p>
-        </div>
-        {% endfor %}
-      </div>
     </div>
-  </div>
+    {% endif %}
+
+    <div class="song {% if loop.index0 < 27 %}b_song{% endif %}">
+        <div class="ill-box">
+            <div class="num">
+                <p name="pvis">#{{ song.num }}</p>
+            </div>
+            <div class="ill">
+                <img src="{{ song.illustration }}" alt="ill">
+            </div>
+            <div class="rank-{{ song.rank }}">
+                <div class="org">
+                    <p>{{ song.rank }}&ensp;{{ song.difficulty }}</p>
+                </div>
+                <div class="rel">
+                    <p>{{ "%.2f"|format(song.rks) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="info-{{ song.rank }}">
+            <div class="songname">
+                <p name="pvis">{{ song.song }}</p>
+            </div>
+            <div class="songinfo">
+                <div class="Rating">
+                    <img src="{{ _res_path }}html/otherimg/{{ song.Rating }}.png" alt="{{ song.Rating }}">
+                </div>
+                <div class="chengji">
+                    <div class="score">
+                        <p>{{ song.score }}</p>
+                    </div>
+                    <div class="line"></div>
+                    <div class="acc-box">
+                        <div class="acc">
+                            <p>{{ "%.2f"|format(song.acc) }}%</p>
+                        </div>
+                        <div class="suggest">
+                            <p>>> {{ song.suggest }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+<div class="createdbox">
+    <div class="phi-plugin">
+        <p>{{ _plugin }}</p>
+    </div>
+    <div class="ver">
+        <p>{{ Version.ver }}</p>
+    </div>
 </div>
 
-<div class="b19">
-  {% for song in phi %} {% if song %}
-  <div class="song phi_song">
-    <div class="ill-box">
-      <div class="num">
-        <p name="pvis">P{{ loop.index + 1 }}</p>
-      </div>
-      <div class="ill">
-        <img src="{{ song.illustration }}" alt="ill" />
-      </div>
-      <div class="rank-{{ song.rank }}">
-        <div class="org">
-          <p>{{ song.rank }}&ensp;{{ "%.1f"|format(song.difficulty) }}</p>
-        </div>
-        <div class="rel">
-          <p>{{ "%.2f"|format(song.rks) }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="info-{{ song.rank }}">
-      <div class="songname">
-        <p name="pvis">{{ song.song }}</p>
-      </div>
-      <div class="songinfo">
-        <div class="Rating">
-          <img
-            src="{{ _res_path }}html/otherimg/{{ song.Rating }}.png"
-            alt="{{ song.Rating }}"
-          />
-        </div>
-        <div class="chengji">
-          <div class="score">
-            <p>{{ song.score }}</p>
-          </div>
-          <div class="line"></div>
-          <div class="acc-box">
-            <div class="acc">
-              <p>{{ "%.2f"|format(song.acc) }}%</p>
-            </div>
-            <div class="suggest">
-              <p>>> {{ song.suggest }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% else %}
-  <div class="Nosignal">
-    <div class="border_corner border_corner_left_top"></div>
-    <div class="border_corner border_corner_right_top"></div>
-    <div class="border_corner border_corner_left_bottom"></div>
-    <div class="border_corner border_corner_right_bottom"></div>
-    <div class="line"></div>
-    <div class="timeout">
-      <p>TIME_OUT</p>
-    </div>
-    <div class="client">
-      <p>>>> PhigrOS Client Finding Phi.score</p>
-    </div>
-    <div class="sqrt"></div>
-  </div>
-  {% endif %} {% endfor %} {% for song in b19_list %} {% if loop.index == 27 %}
-  <div class="over_flow">
-    <div class="flow_line_box_l">
-      {% for _ in range(6) %}
-      <div class="flow_line"></div>
-      {% endfor %}
-    </div>
-    <p><i>OVER FLOW</i></p>
-    <div class="flow_line_box_r">
-      {% for _ in range(6) %}
-      <div class="flow_line"></div>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
+{% if theme == "snow" %}
+<div class="snow-box"> </div>
+<script>
+    function addSnow() {
+        var snow = document.createElement("div")
+        snow.innerHTML = `<img src="{{ _res_path }}html/otherimg/snow${Math.floor(Math.random() * 4) + 1}.png">`
+        snow.className = "snow"
+        snow.style.left = `${Math.random() * 100}%`
+        snow.style.bottom = `${Math.random() * 100}%`
+        snow.style.width = `${Math.random() * 4}%`
+        snow.style.rotate = `${Math.random() * 360}deg`
+        snow.style.transform = `rotate3d(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random() * 360}deg)`
+        snow.style.filter = `blur(${Math.random() * 2}px)`
+        const tar = document.getElementsByClassName("snow-box")[0]
+        tar.appendChild(snow)
+    }
+    var sum = Math.floor(Math.random() * 100) + 50
+    while (sum--) {
+        addSnow()
+    }
+</script>
+{% elif theme == "star" %}
+<canvas id="stars"></canvas>
+<script src="{{ _res_path }}html/common/star.js"></script>
+{% endif %}
 
-  <div class="song {% if loop.index < 27 %}b_song{% endif %}">
-    <div class="ill-box">
-      <div class="num">
-        <p name="pvis">#{{ song.num }}</p>
-      </div>
-      <div class="ill">
-        <img src="{{ song.illustration }}" alt="ill" />
-      </div>
-      <div class="rank-{{ song.rank }}">
-        <div class="org">
-          <p>{{ song.rank }}&ensp;{{ "%.1f"|format(song.difficulty) }}</p>
-        </div>
-        <div class="rel">
-          <p>{{ "%.2f"|format(song.rks) }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="info-{{ song.rank }}">
-      <div class="songname">
-        <p name="pvis">{{ song.song }}</p>
-      </div>
-      <div class="songinfo">
-        <div class="Rating">
-          <img
-            src="{{ _res_path }}html/otherimg/{{ song.Rating }}.png"
-            alt="{{ song.Rating }}"
-          />
-        </div>
-        <div class="chengji">
-          <div class="score">
-            <p>{{ song.score }}</p>
-          </div>
-          <div class="line"></div>
-          <div class="acc-box">
-            <div class="acc">
-              <p>{{ "%.2f"|format(song.acc) }}%</p>
-            </div>
-            <div class="suggest">
-              <p>>> {{ song.suggest }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endfor %}
-</div>
 {% endblock %}

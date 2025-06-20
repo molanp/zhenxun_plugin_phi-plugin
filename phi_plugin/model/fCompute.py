@@ -13,9 +13,7 @@ from zhenxun.utils.withdraw_manage import WithdrawManager
 
 from ..components.Logger import logger
 from ..utils import Date
-from .cls.type import songString
 from .constNum import MAX_DIFFICULTY
-from .getInfo import getInfo
 
 
 class fCompute:

@@ -1,160 +1,178 @@
-{% extends defaultLayout %} {% block css %}
-<link rel="stylesheet" href="{{ _res_path }}html/userinfo/userinfo.css" />
-<link rel="stylesheet" href="{{ _res_path }}html/score/score.css" />
-{% endblock %} {% block main %} {% if background or illustration %}
-<div class="background">
-  <img
-    src="{{ background or illustration }}"
-    alt="{{ background or illustration }}"
-  />
-</div>
-{% endif %}
-<div class="left">
-  <div class="Player_Info">
-    <p>PLAYER & SONGS_INFO</p>
-  </div>
-  <div class="Player_Info-after"></div>
-  <div class="basic-box">
-    <div class="song_Id">
-      <p name="pvis">{{ songName }}</p>
-    </div>
-    <div class="basic-img">
-      <img src="{{ illustration }}" alt="{{ illustration }}" />
-    </div>
-    <div class="Player_Id">
-      <div class="avatar">
-        <img
-          src="{{ _res_path }}html/avatar/{{ avatar }}.png"
-          alt="{{ avatar }}"
-        />
-      </div>
-      <div class="Player_Id-box">
-        <div class="Player_Id-left">
-          <p>ID</p>
-        </div>
-        <div class="Player_Id-right">
-          <p name="pvis">{{ PlayerId }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="left_title">
-    <div class="left_title-left">
-      <p>PLAYER_DETAIL</p>
-    </div>
-  </div>
-  <div class="Player_data_line">
-    <div class="Player_data_line-left">
-      <div class="Player_data_title" id="Player_data_left">
-        <p>RKS</p>
-      </div>
-      <div class="Player_data_value" id="Player_data_left">
-        <p>{{ Rks }}</p>
-      </div>
-    </div>
-    <div class="Player_data_line-right">
-      <div class="Player_data_title" id="Player_data_right">
-        <p>CLG MOD</p>
-      </div>
-      <div
-        class="Challenge"
-        id="Challenge{% if CLGMOD %}1{% else %}2{% endif %}"
-      >
-        <img
-          src="{{ _res_path }}html/otherimg/{{ ChallengeMode }}.png"
-          alt="{{ ChallengeMode }}"
-        />
-        <span>{{ ChallengeModeRank }}</span>
-      </div>
-      {% if CLGMOD %}
-      <div
-        class="Player_data_value CLG{% if EX %} colorful{% endif %}"
-        id="Player_data_right"
-      >
-        <p name="pvis">{{ CLGMOD }}</p>
-      </div>
-      {% endif %}
-    </div>
-  </div>
-  <div class="left_title">
-    <div class="left_title-left">
-      <p>SONG_DETAIL</p>
-    </div>
-  </div>
+{% extends "defaultLayout" %}
 
-  <div class="rank_dif_{% if scoreData.AT %}1{% else %}0{% endif %}">
-    {% for song in scoreData %} {% if song.difficulty != 'SP' %}
-    <div class="a_rank">
-      <div class="a_rank_dif">
-        <p>{{ song.difficulty or '-' }}</p>
-      </div>
-      <div class="a_rank_name">
-        <p>{{ loop.index }}</p>
-      </div>
+{% block css %}
+<link rel="stylesheet" href="{{ _res_path }}html/userinfo/userinfo.css">
+<link rel="stylesheet" href="{{ _res_path }}html/score/score.css">
+{% endblock %}
+
+{% block main %}
+
+    {% if background or illustration %}
+    <div class="background">
+        <img src="{{ background if background else illustration }}" alt="{{ background if background else illustration }}">
     </div>
-    {% endif %} {% endfor %}
-  </div>
-  <div class="createdbox">
-    <div class="phi-plugin">
-      <p>{{ _plugin }}</p>
-    </div>
-    <div class="ver">
-      <p>{{ Version.ver }}</p>
-    </div>
-  </div>
-</div>
-<div class="right">
-  <div class="file-content">
-    <div class="file-content-left">
-      <p>SCORE_DATA</p>
-    </div>
-  </div>
-  <div class="data_title">
-    <div class="data_title-left">
-      <p>SCORE_INFO</p>
-    </div>
-  </div>
-  <div class="stats-box">
-    {% for rank in scoreData %}
-    <div class="one-stats-box {{ rank }}" id="{{ rank.Rating or 'NEW' }}">
-      <div class="rank">
-        <p>{{ loop.index }}</p>
-      </div>
-      {% if rank.Rating %}
-      <div class="stats-up">
-        <div class="Rating">
-          <img
-            src="{{ _res_path }}html/otherimg/{{ rank.Rating }}.png"
-            alt="{{ rank.Rating }}"
-          />
+    {% endif %}
+    <div class="left">
+        <div class="Player_Info">
+            <p>PLAYER & SONGS_INFO</p>
         </div>
-        {% if rank.Rating != 'NEW' %}
-        <div class="data_score">
-          <p>{{ rank.score }}</p>
+        <div class="Player_Info-after"></div>
+        <div class="basic-box">
+            <div class="song_Id">
+                <p name="pvis">{{ songName }}</p>
+            </div>
+            <div class="basic-img">
+                <img src="{{ illustration }}" alt="{{ illustration }}">
+            </div>
+            <div class="Player_Id">
+                <div class="avatar">
+                    <img src="{{ _res_path }}html/avatar/{{ avatar }}.png" alt="{{ avatar }}">
+                </div>
+                <div class="Player_Id-box">
+                    <div class="Player_Id-left">
+                        <p>ID</p>
+                    </div>
+                    <div class="Player_Id-right">
+                        <p name="pvis">{{ PlayerId }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        {% endif %}
-      </div>
-      {% if rank.Rating != 'NEW' %}
-      <div class="data_mid">
-        <div class="data_rks">
-          <p>{{ rank.rks }}</p>
+        <div class="left_title">
+            <div class="left_title-left">
+                <p>PLAYER_DETAIL</p>
+            </div>
         </div>
-        <div class="data_acc">
-          <p>{{ rank.acc }}%</p>
+        <div class="Player_data_line">
+            <div class="Player_data_line-left">
+                <div class="Player_data_title" id="Player_data_left">
+                    <p>RKS</p>
+                </div>
+                <div class="Player_data_value" id="Player_data_left">
+                    <p>{{ Rks }}</p>
+                </div>
+            </div>
+            <div class="Player_data_line-right">
+                <div class="Player_data_title" id="Player_data_right">
+                    <p>CLG MOD</p>
+                </div>
+                <div class="Challenge" id="Challenge{{ '1' if CLGMOD else '2' }}">
+                    <img src="{{ _res_path }}html/otherimg/{{ ChallengeMode }}.png" alt="{{ ChallengeMode }}">
+                    <span>{{ ChallengeModeRank }}</span>
+                </div>
+                {% if CLGMOD %}
+                <div class="Player_data_value CLG{{ ' colorful' if EX else '' }}" id="Player_data_right">
+                    <p name="pvis">{{ CLGMOD }}</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
-      </div>
-      <div class="data_bottom">
-        <div class="data_suggest">
-          <p>>> {{ rank.suggest }}</p>
+        <div class="left_title">
+            <div class="left_title-left">
+                <p>SONG_DETAIL</p>
+            </div>
         </div>
-      </div>
-      {% endif %} {% else %}
-      <div class="no_info">
-        <p>Locked</p>
-      </div>
-      {% endif %}
+
+        <div class="rank_dif_{{ 1 if scoreData.AT else 0 }}">
+            {% for idx, song in scoreData.items() %}
+            {% if song.difficulty != 'SP' %}
+            <div class="a_rank">
+                <div class="a_rank_dif">
+                    <p>{{ song.difficulty if song.difficulty else '-' }}</p>
+                </div>
+                <div class="a_rank_name">
+                    <p>{{ idx }}</p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <div class="createdbox">
+            <div class="phi-plugin">
+                <p>{{ _plugin }}</p>
+            </div>
+            <div class="ver">
+                <p>{{ Version.ver }}</p>
+            </div>
+        </div>
     </div>
-    {% endfor %}
-  </div>
-</div>
+    <div class="right">
+        <div class="file-content">
+            <div class="file-content-left">
+                <p>SCORE_DATA</p>
+            </div>
+        </div>
+        <div class="data_title">
+            <div class="data_title-left">
+                <p>SCORE_INFO</p>
+            </div>
+        </div>
+        <div class="stats-box">
+            {% for idx, rank in scoreData.items() %}
+            <div class="one-stats-box {{ rank }}" id="{{ rank.Rating if rank.Rating else 'NEW' }}">
+                <div class="rank">
+                    <p>{{ idx }}</p>
+                </div>
+                {% if rank.Rating %}
+                <div class="stats-up">
+                    <div class="Rating">
+                        <img src="{{ _res_path }}html/otherimg/{{ rank.Rating }}.png" alt="{{ rank.Rating }}">
+                    </div>
+                    {% if rank.Rating != 'NEW' %}
+                    <div class="data_score">
+                        <p>{{ rank.score }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if rank.Rating != 'NEW' %}
+                <div class="data_mid">
+                    <div class="data_rks">
+                        <p>{{ rank.rks }}</p>
+                    </div>
+                    <div class="data_acc">
+                        <p>{{ rank.acc }}%</p>
+                    </div>
+                </div>
+                <div class="data_bottom">
+                    <div class="data_suggest">
+                        <p>>> {{ rank.suggest }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="no_info">
+                    <p>Locked</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="data_title">
+            <div class="data_title-left">
+                <p>SCORE_HISTORY</p>
+            </div>
+        </div>
+        <div class="scoreHistory">
+            {% for song in history %}
+            <div class="oneHistory {{ song.rank }}">
+                <div class="HistoryDate">
+                    <p>{{ song.date_new }}</p>
+                </div>
+                <div class="HistoryRating">
+                    <img src="{{ _res_path }}html/otherimg/{{ song.Rating }}.png" alt="{{ song.Rating }}">
+                </div>
+                <div class="HistoryScore">
+                    <p>{{ song.score_new }}</p>
+                </div>
+                <div class="HistoryAcc">
+                    <p>{{ "%.4f"|format(song.acc_new) }}%</p>
+                </div>
+                <div class="HistoryRks">
+                    <p>{{ "%.2f"|format(song.rks_new) if song.rks_new else '' }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

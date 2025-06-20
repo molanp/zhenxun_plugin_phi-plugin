@@ -73,7 +73,7 @@
                         </div>
                         <div class="basic_info">
                             <div class="user_name">
-                                <p name="pvis" id="user-name">就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你</p>
+                                <p id="user-name" style="font-size: 30px;">就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你就是不会告诉你</p>
                             </div>
                             <div class="user_rks">
                                 <div class="player_rks">
@@ -260,71 +260,66 @@
                 <div class="rating_stats_group">
                     <img src="../otherimg/phi.png" alt="phi">
                     <p>20</p>
-                    <div class="rating_stats_bar" style="height: 50%;"></div>
                 </div>
                 <div class="rating_stats_group">
                     <img src="../otherimg/FC.png" alt="FC">
-                    <div class="rating_stats_bar" style="height: 50%;"></div>
+                    <p>20</p>
                 </div>
                 <div class="rating_stats_group">
                     <img src="../otherimg/V.png" alt="V">
-                    <div class="rating_stats_bar" style="height: 50%;"></div>
+                    <p>20</p>
                 </div>
                 <div class="rating_stats_group">
                     <img src="../otherimg/S.png" alt="S">
-                    <div class="rating_stats_bar" style="height: 50%;"></div>
+                    <p>20</p>
                 </div>
                 <div class="rating_stats_group">
                     <img src="../otherimg/A.png" alt="A">
-                    <div class="rating_stats_bar" style="height: 50%;"></div>
+                    <p>20</p>
                 </div>
                 <div class="rating_stats_group">
                     <img src="../otherimg/B.png" alt="B">
-                    <div class="rating_stats_bar" style="height: 50%;"></div>
+                    <p>20</p>
                 </div>
                 <div class="rating_stats_group">
                     <img src="../otherimg/C.png" alt="C">
-                    <div class="rating_stats_bar" style="height: 50%;"></div>
+                    <p>20</p>
                 </div>
                 <div class="rating_stats_group">
                     <img src="../otherimg/F.png" alt="F">
-                    <div class="rating_stats_bar" style="height: 50%;"></div>
+                    <p>20</p>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        function isBiggerThanParent(songName, parentElement) {
-            return songName.scrollWidth > parentElement.offsetWidth || songName.scrollHeight > parentElement.offsetHeight
-        }
         function adjustFontSize() {
-            //获取p元素
-            let a = document.getElementsByName('pvis')
-            for (let i = 0; i < a.length; ++i) {
+            //获取user_name和composer滴元素
+            var songName = document.getElementById('user-name')
 
-                let songName = a[i]
+            /*调整曲目名称字体大小*/
+            var parentElement = songName.parentElement
 
-                if (!songName) continue
+            var maxFontSize = 30 //设置最大字体大小
 
+            //如果字体宽度小于父元素宽度，则增大字体大小
+            while (songName.scrollWidth < parentElement.offsetWidth && songName.scrollHeight < parentElement.offsetHeight) {
+                var style = window.getComputedStyle(songName, null).getPropertyValue('font-size')
+                var fontSize = parseFloat(style)
 
-                /*调整曲目名称字体大小*/
-                let parentElement = songName.parentElement
-
-                if (!isBiggerThanParent(songName, parentElement)) continue
-
-                let fontSize = Number(window.getComputedStyle(songName, null).getPropertyValue('font-size').replace("px", ""));
-
-                let l = 0, r = fontSize;
-                while (l < r) {
-                    let mid = Math.floor((l + r + 1) / 2);
-                    songName.style.fontSize = mid + "px";
-                    if (isBiggerThanParent(songName, parentElement)) {
-                        r = mid - 1;
-                    } else {
-                        l = mid;
-                    }
+                //检查是否已经达到最大字体大小
+                if (fontSize >= maxFontSize) {
+                    break
                 }
-                songName.style.fontSize = l + "px";
+
+                songName.style.fontSize = (fontSize + 1) + "px"
+            }
+
+            // 如果字体宽度大于父元素宽度，则减小字体大小
+            while (songName.scrollWidth > parentElement.offsetWidth || songName.scrollHeight > parentElement.offsetHeight) {
+                var style = window.getComputedStyle(songName, null).getPropertyValue('font-size')
+                var fontSize = parseFloat(style);
+                songName.style.fontSize = (fontSize - 1) + "px";
             }
 
         }
